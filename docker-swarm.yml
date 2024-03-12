@@ -49,7 +49,7 @@ services:
       - swarm
 
   elasticsearch:
-    image: "elasticsearch:8.12.2"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:8.2.0"
     ports:
       - 9200:9200
       - 9300:9300
