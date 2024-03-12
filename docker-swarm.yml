@@ -55,7 +55,7 @@ services:
       - 9300:9300
     environment:
       discovery.type: "single-node"
-      ES_JAVA_OPTS: "-Xms2g -Xmx2g"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
       xpack.security.enabled: "false"
       xpack.monitoring.templates.enabled: "true"
     volumes:
@@ -65,7 +65,7 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: 512M
+          memory: 1G
         reservations:
           cpus: "0.1"
           memory: 20M
