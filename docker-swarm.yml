@@ -1,11 +1,11 @@
 version: "3.9"
+
 services:
   web:
     image: urnau/php82-app-2023:v1
     networks:
       - swarm
     volumes:
-      # - ./app:/var/www/app
       - ./nginx-sites.conf:/etc/nginx/sites-enabled/default.conf
     deploy:
       replicas: 1
@@ -21,8 +21,142 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    
+  mysql:
+    image: "mysql:8.0.19"
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
+    ports:
+      - 3306:3306
+    volumes:
+      - database:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=123
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 500M
+        reservations:
+          cpus: "0.1"
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm
+
+  elasticsearch:
+    image: "elasticsearch:8.12.2"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      discovery.type: "single-node"
+      ES_JAVA_OPTS: "-Xms2g -Xmx2g"
+      xpack.security.enabled: "false"
+      xpack.monitoring.templates.enabled: "true"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 100M
+        reservations:
+          cpus: "0.1"
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:8.2.0"
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 100M
+        reservations:
+          cpus: "0.1"
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm
+
+  rabbitmq:
+    image: "rabbitmq:3-management-alpine"
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=root
+    volumes:
+      - rmqdata:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 100M
+        reservations:
+          cpus: "0.1"
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm
+
+  redis:
+    image: "redis:alpine3.19"
+    ports:
+      - 6379:6379
+    volumes:
+      - cache:/data
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      retries: 3
+      timeout: 5s
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 100M
+        reservations:
+          cpus: "0.1"
+          memory: 20M
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm
 
 networks:
   swarm:
     external: true
     name: swarm
+
+volumes:
+  database:
+    name: mysql_db_vol
+  rmqdata:
+    name: rabbit_rmq_vol
+  cache:
+    name: redis_cache_vol
+  esdata:
+    name: elasticsearch_es_vol 
+    driver: local
