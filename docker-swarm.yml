@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   web:
-    image: urnau/php82-app-2023:v1
+    image: lecastro1993/setup-docker-php-2023
     networks:
       - swarm
     volumes:
@@ -48,75 +48,75 @@ services:
     networks:
       - swarm
 
-  elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:8.2.0"
-    ports:
-      - 9200:9200
-      - 9300:9300
-    environment:
-      discovery.type: "single-node"
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-      xpack.security.enabled: "false"
-      xpack.monitoring.templates.enabled: "true"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: "1"
-          memory: 1G
-        reservations:
-          cpus: "0.1"
-          memory: 20M
-      restart_policy:
-        condition: on-failure
-    networks:
-      - swarm
+  # elasticsearch:
+  #   image: "docker.elastic.co/elasticsearch/elasticsearch:8.2.0"
+  #   ports:
+  #     - 9200:9200
+  #     - 9300:9300
+  #   environment:
+  #     discovery.type: "single-node"
+  #     ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+  #     xpack.security.enabled: "false"
+  #     xpack.monitoring.templates.enabled: "true"
+  #   volumes:
+  #     - esdata:/usr/share/elasticsearch/data
+  #   deploy:
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         cpus: "1"
+  #         memory: 1G
+  #       reservations:
+  #         cpus: "0.1"
+  #         memory: 20M
+  #     restart_policy:
+  #       condition: on-failure
+  #   networks:
+  #     - swarm
 
-  kibana:
-    image: "docker.elastic.co/kibana/kibana:8.2.0"
-    ports:
-      - 5601:5601
-    environment:
-      ELASTICSEARCH_URL: "http://elasticsearch:9200"
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 1G
-        reservations:
-          cpus: "0.1"
-          memory: 20M
-      restart_policy:
-        condition: on-failure
-    networks:
-      - swarm
+  # kibana:
+  #   image: "docker.elastic.co/kibana/kibana:8.2.0"
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     ELASTICSEARCH_URL: "http://elasticsearch:9200"
+  #   deploy:
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         cpus: "0.5"
+  #         memory: 1G
+  #       reservations:
+  #         cpus: "0.1"
+  #         memory: 20M
+  #     restart_policy:
+  #       condition: on-failure
+  #   networks:
+  #     - swarm
 
-  rabbitmq:
-    image: "rabbitmq:3-management-alpine"
-    environment:
-      - RABBITMQ_DEFAULT_USER=root
-      - RABBITMQ_DEFAULT_PASS=root
-    volumes:
-      - rmqdata:/var/lib/rabbitmq
-    ports:
-      - 5672:5672
-      - 15672:15672
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: "1"
-          memory: 1G
-        reservations:
-          cpus: "0.1"
-          memory: 20M
-      restart_policy:
-        condition: on-failure
-    networks:
-      - swarm
+  # rabbitmq:
+  #   image: "rabbitmq:3-management-alpine"
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=root
+  #     - RABBITMQ_DEFAULT_PASS=root
+  #   volumes:
+  #     - rmqdata:/var/lib/rabbitmq
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+  #   deploy:
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         cpus: "1"
+  #         memory: 1G
+  #       reservations:
+  #         cpus: "0.1"
+  #         memory: 20M
+  #     restart_policy:
+  #       condition: on-failure
+  #   networks:
+  #     - swarm
 
   redis:
     image: "redis:alpine3.19"
@@ -153,10 +153,10 @@ networks:
 volumes:
   database:
     name: mysql_db_vol
-  rmqdata:
-    name: rabbit_rmq_vol
   cache:
     name: redis_cache_vol
-  esdata:
-    name: elasticsearch_es_vol 
-    driver: local
+  # rmqdata:
+  #   name: rabbit_rmq_vol
+  # esdata:
+  #   name: elasticsearch_es_vol 
+  #   driver: local
