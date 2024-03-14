@@ -37,7 +37,7 @@ docker stats
 - Executar aplicação docker direto
 
 ```sh
-docker run -p 80:80 urnau/php82-app-2023:v1
+docker run -p 80:80 -p 443:443 lecastro1993/setup-docker-php-2023
 ```
 
 - Script para upar aplicação
